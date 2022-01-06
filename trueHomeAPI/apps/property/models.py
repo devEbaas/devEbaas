@@ -9,7 +9,7 @@ class PropertyModel(models.Model):
     created_at = models.DateTimeField(null=False, blank=False)
     updated_at = models.DateTimeField(null=False, blank=False)
     disabled_at = models.DateTimeField(null=True)
-    status = models.CharField(null=False)
+    status = models.CharField(null=False, max_length=255)
 
     def __str__(self):
         return self.title

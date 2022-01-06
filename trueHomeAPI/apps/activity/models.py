@@ -9,7 +9,7 @@ class ActivityModel(models.Model):
     title = models.CharField(max_length=255, null=False)
     created_at = models.DateTimeField(null=False, blank=False)
     updated_at = models.DateTimeField(null=False, blank=False)
-    status = models.CharField(null=False)
+    status = models.CharField(null=False, max_length=255)
 
     def __str__(self):
         return "{0} - {1}".format(self.property_id, self.title)
