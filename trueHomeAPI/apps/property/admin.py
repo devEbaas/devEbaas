@@ -1,6 +1,6 @@
 from django.contrib import admin
-from trueHomeAPI.apps.property.models import PropertyModel
+from .models import PropertyModel
 
-admin.register(PropertyModel)
+admin.site.register(PropertyModel)
 
 # Register your models here.
