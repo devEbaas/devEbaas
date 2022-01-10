@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('answers', models.JSONField(verbose_name='Answers')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('activity', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='activity.activitymodel')),
+                ('activity_id', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='activity.activitymodel')),
             ],
         ),
     ]

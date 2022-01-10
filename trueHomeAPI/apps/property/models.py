@@ -8,9 +8,9 @@ class PropertyModel(models.Model):
         ('DISABLED', 'disabled'),
         ('ENABLED', 'enabled'),
     ]
-
-    title = models.CharField(primary_key=True ,max_length=255, null=False, blank=False)
-    address = models.TextField(null=False, blank=False)
+    # id = models.BigAutoField(primary_key=True, blank=False, null=False, auto_created=True)
+    title = models.CharField(max_length=255, null=False, blank=False)
+    address = models.TextField(null=False, blank=False) 
     description = models.TextField(null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
     updated_at = models.DateTimeField(null=False, blank=False)

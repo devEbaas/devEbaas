@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PropertyModel',
             fields=[
-                ('title', models.CharField(max_length=255, primary_key=True, serialize=False)),
+                ('title', models.CharField(max_length=255, serialize=False)),
                 ('address', models.TextField()),
                 ('description', models.TextField()),
                 ('created_at', models.DateTimeField()),

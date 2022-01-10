@@ -10,7 +10,7 @@ class ActivityModel(models.Model):
         ('CANCELLED', 'cancelled'),
         ('DONE', 'done')
     ]
-    # id = models.IntegerField(primary_key=True, null=False, blank=False)
+    
     property_id = models.ForeignKey(PropertyModel, verbose_name='Property',on_delete=models.CASCADE)
     schedule = models.DateTimeField(null=False, blank=False)
     title = models.CharField(max_length=255, null=False)
@@ -19,7 +19,7 @@ class ActivityModel(models.Model):
     status = models.CharField(null=False, choices=STATUS_CHOICES, default='ACTIVE',max_length=255)
 
     def __str__(self):
-        return "{0} - {1}".format(self.property_id, self.title)
+        return "{0}".format(self.title)
     
     # meta con información de nombre del modelo
     class Meta: 
