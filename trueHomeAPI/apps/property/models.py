@@ -13,7 +13,7 @@ class PropertyModel(models.Model):
     address = models.TextField(null=False, blank=False) 
     description = models.TextField(null=False, blank=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=False)
-    updated_at = models.DateTimeField(null=False, blank=False)
+    updated_at = models.DateTimeField(auto_now=True, null=False, blank=False)
     disabled_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(null=False, choices= PROPERTY_STATUS, default='ENABLED', max_length=255)
 

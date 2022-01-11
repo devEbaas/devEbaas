@@ -15,7 +15,7 @@ class ActivityModel(models.Model):
     schedule = models.DateTimeField(null=False, blank=False)
     title = models.CharField(max_length=255, null=False)
     created_at = models.DateTimeField(auto_now_add=True,null=False, blank=False)
-    updated_at = models.DateTimeField(null=False, blank=False)
+    updated_at = models.DateTimeField(auto_now_add=True ,null=False, blank=False)
     status = models.CharField(null=False, choices=STATUS_CHOICES, default='ACTIVE',max_length=255)
 
     def __str__(self):

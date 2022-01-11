@@ -6,3 +6,8 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyModel
         fields = '__all__'
+
+class PropertyFilterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyModel
+        fields=['id','title', 'address']
