@@ -3,7 +3,6 @@ from django.db import models
 
 # Create your models here.
 class PropertyModel(models.Model):
-
     PROPERTY_STATUS = [
         ('DISABLED', 'disabled'),
         ('ENABLED', 'enabled'),
