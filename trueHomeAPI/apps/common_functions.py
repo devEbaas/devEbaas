@@ -32,13 +32,12 @@ def validate_activity_condition(activity):
             condition_status = 'Cancelada'
         else: 
             condition_status = 'Sin condición'
+
     except Exception as ex:
         print(ex)
     return condition_status
 
-def validate_schedule_availability(property_id, date):
-    print(date)
-    
+def validate_schedule_availability(property_id, date):    
     try:
         is_available = None
         end_date = date + datetime.timedelta(hours=1)

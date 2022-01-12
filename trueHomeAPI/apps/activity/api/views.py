@@ -12,9 +12,37 @@ import logging
 class ActivityAPIView(APIView):
 
     def get(self, request):
-        activities = ActivityModel.objects.all()
-        activity_serializer = ActivityListSerializer(activities,many=True, context={'request': request})
-        return Response(activity_serializer.data, status = status.HTTP_200_OK)
+        # Obtención de query pararms
+        start_date = request.query_params.get('start_date', None);
+        end_date = request.query_params.get('end_date', None)
+        status_param = request.query_params.get('status', None)
+        
+        try:
+            # se definen los rangos de fecha por default 
+            default_start_date = timezone.now().replace(hour=0, minute=0, second=0) - timezone.timedelta(days=3)
+            default_end_date = timezone.now().replace(hour=23, minute=59, second=59) + timezone.timedelta(weeks=2)
+            # variable para setear el query_string por default de la petición
+            query_request = ActivityModel.objects.filter(schedule__gte = default_start_date, schedule__lte = default_end_date).order_by('schedule')
+            # Se valida que query params se han proporcionado, en caso de no proporcionar, se toma el query_request inicial
+            if start_date and end_date and status_param:
+                print('entra en el primero')
+                query_request = ActivityModel.objects.filter(schedule__gte=start_date, schedule__lte=end_date, status = status_param).order_by('schedule')
+            elif start_date and end_date:
+                print('entra aquí')
+                query_request = ActivityModel.objects.filter(schedule__gte=start_date, schedule__lte=end_date).order_by('schedule')
+            elif status_param:
+                print('entra en el tercero')
+                query_request = ActivityModel.objects.filter(status = status_param).order_by('schedule')
+
+            activity_serializer = ActivityListSerializer(query_request,many=True, context={'request': request})
+            return Response(activity_serializer.data, status = status.HTTP_200_OK)
+        except Exception as ex:
+            print(ex)
+            return Response(data ={'message': 'no se ha podido obtener la lista de actividades'}, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # activities = ActivityModel.objects.all()
+        # activity_serializer = ActivityListSerializer(activities,many=True, context={'request': request})
+        # return Response(activity_serializer.data, status = status.HTTP_200_OK)
 
     # Función para guardar una nueva actividad
     def post(self, request):
@@ -30,13 +58,12 @@ class ActivityAPIView(APIView):
                         with transaction.atomic():
                             activity_serializer.save()
                             return Response(activity_serializer.data, status = status.HTTP_201_CREATED)
-                    else:
-                        return Response(data={'message': 'El horario ya se encuentra ocupado por otra actividad'},status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response(data={'message': 'No se puede crear una actividad para una propiedad desactivada'},status=status.HTTP_400_BAD_REQUEST)
+                    
+                    return Response(data={'message': 'El horario ya se encuentra ocupado por otra actividad'},status=status.HTTP_400_BAD_REQUEST)
+                
+                return Response(data={'message': 'No se puede crear una actividad para una propiedad desactivada'},status=status.HTTP_400_BAD_REQUEST)
 
-            else:
-                return Response(activity_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+            return Response(activity_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             logging.getLogger('Ha ocurrido un error al guardar la propiedad')
             print(ex)
@@ -61,8 +88,8 @@ class CancelActivityAPIView(APIView):
                     activity_to_cancel.updated_at = timezone.now()
                     activity_to_cancel.save()
                     return Response(ActivityListSerializer(activity_to_cancel, context={'request': request}).data, status = status.HTTP_202_ACCEPTED)
-            else:
-                return Response(cancel_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+            return Response(cancel_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         except Exception as Ex:
             print(Ex)
             return Response(data = {'message': 'Ha ocurrido un error al actualizar el estatus de la actividad'}, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -81,19 +108,17 @@ class ReAgendActivityAPIView(APIView):
                 activity_to_reagend = get_object_or_404(ActivityModel.objects.all(), pk=data['id'])
                 if activity_to_reagend.status == "CANCELLED":
                     return Response(data ={'message':'La actividad no se puede reagendar debido a que está cancelada'}, status = status.HTTP_400_BAD_REQUEST)
-                else:
+
                     # Se valida la disponibilidad de horario de la propiedad
-                    is_available = validate_schedule_availability(activity_to_reagend.property_id, data['schedule'])
-                    if is_available:
-                        with transaction.atomic():
-                            activity_to_reagend.schedule = data['schedule']
-                            activity_to_reagend.updated_at = timezone.now()
-                            activity_to_reagend.save()
-                            return Response(ActivityListSerializer(activity_to_reagend,context={'request': request}).data, status = status.HTTP_202_ACCEPTED)
-                        
-                    else: 
-                        return Response(data = {'message':'La fecha y hora proporcionada ya está en uso'}, status = status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response(reagend_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+                is_available = validate_schedule_availability(activity_to_reagend.property_id, data['schedule'])
+                if is_available:
+                    with transaction.atomic():
+                        activity_to_reagend.schedule = data['schedule']
+                        activity_to_reagend.updated_at = timezone.now()
+                        activity_to_reagend.save()
+                        return Response(ActivityListSerializer(activity_to_reagend,context={'request': request}).data, status = status.HTTP_202_ACCEPTED)
+                return Response(data = {'message':'La fecha y hora proporcionada ya está en uso'}, status = status.HTTP_400_BAD_REQUEST)
+            
+            return Response(reagend_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             print(ex)

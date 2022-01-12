@@ -24,16 +24,15 @@ class ActivityListSerializer(serializers.ModelSerializer):
         property_data = PropertyFilterSerializer(instance.property_id).data
         survey = find_survey_by_activity(instance.id)
         survey_data = SurveySerializer(survey, context= self.context).data
+        # Asignación de propiedades a la instancia 
+        activity_data['condition'] = validate_activity_condition(instance)
+        activity_data['property'] = property_data
         try:
             if survey_data:
                 activity_data['survey'] = "{0}/survey/detail/{1}/".format(get_current_site(self.context['request']), survey.id)
         except Exception as ex:
             activity_data['survey'] = None 
             print(ex)
-        # Asignación de propiedades a la instancia 
-        # print(get_current_site(self.context['request']))
-        activity_data['condition'] = validate_activity_condition(instance)
-        activity_data['property'] = property_data
 
         return activity_data
 

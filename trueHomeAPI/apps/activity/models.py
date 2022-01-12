@@ -10,7 +10,6 @@ class ActivityModel(models.Model):
         ('CANCELLED', 'cancelled'),
         ('DONE', 'done')
     ]
-    
     property_id = models.ForeignKey(PropertyModel, verbose_name='Property',on_delete=models.CASCADE)
     schedule = models.DateTimeField(null=False, blank=False)
     title = models.CharField(max_length=255, null=False)
