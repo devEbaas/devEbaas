@@ -29,13 +29,10 @@ class ActivityAPIView(APIView):
             query_request = ActivityModel.objects.filter(schedule__gte = default_start_date, schedule__lte = default_end_date).order_by('schedule')
             # Se valida que query params se han proporcionado, en caso de no proporcionar, se toma el query_request inicial
             if start_date and end_date and status_param:
-                print('entra en el primero')
                 query_request = ActivityModel.objects.filter(schedule__gte=start_date, schedule__lte=end_date, status = status_param).order_by('schedule')
             elif start_date and end_date:
-                print('entra aquí')
                 query_request = ActivityModel.objects.filter(schedule__gte=start_date, schedule__lte=end_date).order_by('schedule')
             elif status_param:
-                print('entra en el tercero')
                 query_request = ActivityModel.objects.filter(status = status_param).order_by('schedule')
 
             activity_serializer = ActivityListSerializer(query_request,many=True, context={'request': request})
@@ -58,11 +55,12 @@ class ActivityAPIView(APIView):
                         with transaction.atomic():
                             activity_serializer.save()
                             return Response(activity_serializer.data, status = status.HTTP_201_CREATED)
-                    
                     return Response(data={'message': 'El horario ya se encuentra ocupado por otra actividad'},status=status.HTTP_400_BAD_REQUEST)
                 
                 return Response(data={'message': 'No se puede crear una actividad para una propiedad desactivada'},status=status.HTTP_400_BAD_REQUEST)
 
+            
+            # print(activity_serializer.property_id)
             return Response(activity_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
             logger.error(f"Ha ocurrido el siguiente error: {ex}")

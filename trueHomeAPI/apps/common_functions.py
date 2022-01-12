@@ -46,9 +46,7 @@ def validate_schedule_availability(property_id, date):
     try:
         is_available = None
         end_date = date + datetime.timedelta(hours=1)
-        print(end_date)
         total_activities = ActivityModel.objects.filter(schedule__gte=date, schedule__lte=end_date, property_id=property_id).exclude(status = 'CANCELLED').count()
-        print(total_activities)
         if total_activities > 0:
             is_available = False
         else:
