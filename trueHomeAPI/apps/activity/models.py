@@ -3,7 +3,6 @@ from trueHomeAPI.apps.property.models import PropertyModel
 
 # Create your models here.
 class ActivityModel(models.Model):
-
     STATUS_CHOICES = [
         ('DISABLED', 'disabled'),
         ('ACTIVE', 'active'),
