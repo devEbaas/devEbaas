@@ -4,5 +4,5 @@ from trueHomeAPI.apps.activity.api.views import ActivityAPIView, CancelActivityA
 urlpatterns = [
     path('activity/', ActivityAPIView.as_view(), name='activity_api'),
     path('cancel_activity/', CancelActivityAPIView.as_view(), name='cancel_activity'),
-    path('reagend_activity/', ReAgendActivityAPIView.as_view(), name='reagend activity')
+    path('reagend_activity/', ReAgendActivityAPIView.as_view(), name='reagend_activity')
 ]

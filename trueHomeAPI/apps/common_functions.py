@@ -1,14 +1,19 @@
-from trueHomeAPI.apps.survey.models import SurveyModel
-from trueHomeAPI.apps.activity.models import ActivityModel
 import datetime
 import pytz
+import logging
+# Modelos
+from trueHomeAPI.apps.survey.models import SurveyModel
+from trueHomeAPI.apps.activity.models import ActivityModel
+
+logger = logging.getLogger()
+logger.setLevel(logging.ERROR)
 
 def find_survey_by_activity(activity_id):
     survey = None
     try:
         survey = SurveyModel.objects.get(activity_id = activity_id)
     except Exception as ex:
-        print(ex)
+        logger.error(f"Se ha producido el siguiente error: {ex}")
     return survey
 
 def validate_activity_condition(activity):
@@ -34,7 +39,7 @@ def validate_activity_condition(activity):
             condition_status = 'Sin condición'
 
     except Exception as ex:
-        print(ex)
+        logger.error(f"Se ha producido el siguiente error: {ex}")
     return condition_status
 
 def validate_schedule_availability(property_id, date):    
@@ -49,6 +54,6 @@ def validate_schedule_availability(property_id, date):
         else:
             is_available = True
     except Exception as ex:
-        print(ex)
+        logger.error(f"Se ha producido el siguiente error: {ex}")
         return is_available
     return is_available

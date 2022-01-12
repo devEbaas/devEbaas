@@ -1,16 +1,20 @@
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-from trueHomeAPI.apps.activity.api.serializers import ActivitySerializer, ActivityListSerializer, CancelActivitySerializer, ReAgendActivitySerializer
-from trueHomeAPI.apps.common_functions import validate_schedule_availability
-from trueHomeAPI.apps.activity.models import ActivityModel
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.utils import timezone
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
 import logging
+# Modelos, serializadores y funciones
+from trueHomeAPI.apps.activity.api.serializers import ActivitySerializer, ActivityListSerializer, CancelActivitySerializer, ReAgendActivitySerializer
+from trueHomeAPI.apps.common_functions import validate_schedule_availability
+from trueHomeAPI.apps.activity.models import ActivityModel
 
+
+# Se definen los loggers
+logger = logging.getLogger()
+logger.setLevel(logging.ERROR)
 class ActivityAPIView(APIView):
-
     def get(self, request):
         # Obtención de query pararms
         start_date = request.query_params.get('start_date', None);
@@ -37,12 +41,8 @@ class ActivityAPIView(APIView):
             activity_serializer = ActivityListSerializer(query_request,many=True, context={'request': request})
             return Response(activity_serializer.data, status = status.HTTP_200_OK)
         except Exception as ex:
-            print(ex)
+            logger.error(f"Ha ocurrido el siguiente error: {ex}")
             return Response(data ={'message': 'no se ha podido obtener la lista de actividades'}, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        # activities = ActivityModel.objects.all()
-        # activity_serializer = ActivityListSerializer(activities,many=True, context={'request': request})
-        # return Response(activity_serializer.data, status = status.HTTP_200_OK)
 
     # Función para guardar una nueva actividad
     def post(self, request):
@@ -65,16 +65,10 @@ class ActivityAPIView(APIView):
 
             return Response(activity_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
-            logging.getLogger('Ha ocurrido un error al guardar la propiedad')
-            print(ex)
+            logger.error(f"Ha ocurrido el siguiente error: {ex}")
             return Response(data = {'message': 'Ha ocurrido un error en el servidor'},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CancelActivityAPIView(APIView):
-    def get(self, request):
-        activities = ActivityModel.objects.all()
-        activity_serializer = ActivitySerializer(activities,many=True)
-        return Response(activity_serializer.data, status = status.HTTP_200_OK)
-
     def post(self, request):
         try:
             cancel_serializer = CancelActivitySerializer(data = request.data)
@@ -90,16 +84,11 @@ class CancelActivityAPIView(APIView):
                     return Response(ActivityListSerializer(activity_to_cancel, context={'request': request}).data, status = status.HTTP_202_ACCEPTED)
 
             return Response(cancel_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-        except Exception as Ex:
-            print(Ex)
+        except Exception as ex:
+            logger.error(f"Ha ocurrido el siguiente error: {ex}")
             return Response(data = {'message': 'Ha ocurrido un error al actualizar el estatus de la actividad'}, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ReAgendActivityAPIView(APIView):
-    def get(self, request):
-        activities = ActivityModel.objects.all()
-        activity_serializer = ActivitySerializer(activities,many=True)
-        return Response(activity_serializer.data, status = status.HTTP_200_OK)
-
     def post(self, request):
         reagend_serializer = ReAgendActivitySerializer(data = request.data)
         try:
@@ -121,4 +110,4 @@ class ReAgendActivityAPIView(APIView):
             
             return Response(reagend_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
         except Exception as ex:
-            print(ex)
+            logger.error(f"Ha ocurrido el siguiente error: {ex}")

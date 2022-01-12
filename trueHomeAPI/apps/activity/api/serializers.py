@@ -1,20 +1,25 @@
-import socket
 from django.http import HttpRequest
 from rest_framework import serializers
+from django.contrib.sites.shortcuts import get_current_site
+import logging
+# Modelos, Serializadores y funciones
 from trueHomeAPI.apps.activity.models import ActivityModel
 from trueHomeAPI.apps.property.api.serializers import PropertyFilterSerializer
 from trueHomeAPI.apps.survey.api.serializers import SurveySerializer
 from trueHomeAPI.apps.common_functions import find_survey_by_activity, validate_activity_condition
-from django.contrib.sites.shortcuts import get_current_site
 
+# Definimos el logger
+logger = logging.getLogger()
+logger.setLevel(logging.ERROR)
 class ActivitySerializer(serializers.ModelSerializer):
-    # property = serializers.StringRelatedField()
-    # property = PropertySerializer(many=True, read_only=True)
+
     class Meta:
         model = ActivityModel
         fields = '__all__'
 
+# Serializer para listar actividades con campos de property y survey
 class ActivityListSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = ActivityModel
         exclude = ['updated_at', 'property_id']
@@ -31,9 +36,9 @@ class ActivityListSerializer(serializers.ModelSerializer):
             if survey_data:
                 activity_data['survey'] = "{0}/survey/detail/{1}/".format(get_current_site(self.context['request']), survey.id)
         except Exception as ex:
+            logger.error(f"Ha ocurrido el siguiente error: {ex}")
             activity_data['survey'] = None 
-            print(ex)
-
+            
         return activity_data
 
 class ReAgendActivitySerializer(serializers.Serializer):
